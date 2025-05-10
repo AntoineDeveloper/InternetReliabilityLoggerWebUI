@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Reliability Monitor</title>
+    <link rel="stylesheet" href="/style.css">
+    <meta http-equiv="refresh" content="10"> <!-- Auto-refresh page every 10 seconds -->
+</head>
+<body>
+    <h1>Network Reliability Monitor</h1>
+    <p>Server Started: <%= new Date(serverStartTime).toLocaleString() %></p>
+    <p>Monitoring Target: <%= pingTarget %></p>
+
+    <div class="container">
+        <h2>Current Status</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>Latency</h3>
+                <p class="<%= currentStats.latencyClass %>">
+                    <%= currentStats.avgLatency !== null ? currentStats.avgLatency + ' ms' : 'N/A' %>
+                </p>
+            </div>
+            <div class="stat-item">
+                <h3>Packet Loss</h3>
+                <p class="<%= currentStats.lossClass %>">
+                    <%= currentStats.packetLoss !== null ? currentStats.packetLoss + '%' : 'N/A' %>
+                </p>
+            </div>
+            <div class="stat-item">
+                <h3>Jitter</h3>
+                <p class="<%= currentStats.jitterClass %>">
+                    <%= currentStats.jitter !== null ? currentStats.jitter + ' ms' : 'N/A' %>
+                </p>
+            </div>
+            <div class="stat-item">
+                <h3>Status</h3>
+                <p class="<%= currentStats.overallStatusClass %>"><%= currentStats.overallStatus %></p>
+            </div>
+        </div>
+         <p>Last Check: <%= currentStats.timestamp ? new Date(currentStats.timestamp).toLocaleString() : 'Never' %></p>
+    </div>
+
+    <div class="container">
+        <h2>Detected Hiccups (<%= hiccups.length %>)</h2>
+        <% if (hiccups.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Reason</th>
+                        <th>Latency (ms)</th>
+                        <th>Packet Loss (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% hiccups.slice().reverse().forEach(hiccup => { %>
+                        <tr class="hiccup">
+                            <td><%= new Date(hiccup.timestamp).toLocaleString() %></td>
+                            <td class="hiccup-reason"><%= hiccup.reason %></td>
+                            <td><%= hiccup.latency !== null ? hiccup.latency : 'N/A' %></td>
+                            <td><%= hiccup.packetLoss !== null ? hiccup.packetLoss : 'N/A' %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>No hiccups detected yet. Good!</p>
+        <% } %>
+    </div>
+
+    <div class="container">
+        <h2>Stats History (Last <%= statsHistory.length %> checks)</h2>
+        <% if (statsHistory.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Avg Latency (ms)</th>
+                        <th>Min Latency (ms)</th>
+                        <th>Max Latency (ms)</th>
+                        <th>Packet Loss (%)</th>
+                        <th>Jitter (ms)</th>
+                        <th>Alive</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% statsHistory.slice().reverse().forEach(stat => { %>
+                        <tr>
+                            <td><%= new Date(stat.timestamp).toLocaleString() %></td>
+                            <td><%= stat.avgLatency %></td>
+                            <td><%= stat.minLatency %></td>
+                            <td><%= stat.maxLatency %></td>
+                            <td><%= stat.packetLoss %></td>
+                            <td><%= stat.jitter %></td>
+                            <td><%= stat.isAlive ? 'Yes' : 'No' %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>No stats collected yet.</p>
+        <% } %>
+    </div>
+
+</body>
+</html>
